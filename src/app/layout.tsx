@@ -1,15 +1,12 @@
-// src/app/layout.tsx
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { TRPCProvider } from './_trpc/Provider';
 
-import './globals.css'; // or your CSS file
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TRPCProvider>{children}</TRPCProvider>
+      </body>
     </html>
   );
 }

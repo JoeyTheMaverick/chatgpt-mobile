@@ -20,8 +20,16 @@ export const messageRouter = router({
       content: z.string(),
     })
   ).mutation(async ({ input }) => {
+    console.log('message.create input:', input);
     const { data, error } = await supabase.from('messages').insert([input]).select();
-    if (error) throw new Error(error.message);
+    console.log('Supabase insert result:', { data, error });
+    if (error) {
+      console.error('Supabase insert error:', error);
+      throw new Error(error.message);
+    }
+    
+    console.log('Inserted message:', data?.[0]);
+
     return data?.[0];
   }),
 });
