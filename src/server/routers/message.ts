@@ -18,6 +18,7 @@ export const messageRouter = router({
     z.object({
       conversation_id: z.string(),
       content: z.string(),
+      role: z.string(),
     })
   ).mutation(async ({ input }) => {
     console.log('message.create input:', input);

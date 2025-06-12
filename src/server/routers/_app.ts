@@ -1,12 +1,12 @@
 import { router } from '../trpc';
 import { conversationRouter } from './conversation';
 import { messageRouter } from './message';
-import { geminiRouter } from './gemini';
+import { openrouterRouter } from './openrouter';
 
 export const appRouter = router({
   conversation: conversationRouter,
   message: messageRouter,
-  gemini: geminiRouter, 
+  openrouter: openrouterRouter, // add this line
 });
 
 export type AppRouter = typeof appRouter;

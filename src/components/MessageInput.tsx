@@ -1,64 +1,60 @@
-// src/components/MessageInput.tsx
 import { useState } from 'react';
-import { InputGroup, FormControl, Button, Dropdown } from 'react-bootstrap';
-import { trpc } from '@/utils/trpc';
+import { InputGroup, FormControl, Button } from 'react-bootstrap';
+
 
 type Props = {
-  conversationId: any;
+  conversationId: string | null;
   onSend: (content: string) => void;
 };
 
 export default function MessageInput({ conversationId, onSend }: Props) {
   const [value, setValue] = useState('');
-  const utils = trpc.useContext();
-
-  const sendMessage = trpc.message.create.useMutation({
-    onSuccess: () => {
-      utils.message.list.invalidate({ conversation_id: conversationId ?? '' });
-      setValue('');
-    },
-  });
-  const geminiText = trpc.gemini.generateText.useMutation();
-  const geminiImage = trpc.gemini.generateImage.useMutation();
 
   const handleSend = () => {
     if (!value.trim() || !conversationId) return;
-    sendMessage.mutate({ conversation_id: conversationId, content: value });
+    onSend(value);
+    setValue('');
   };
 
-  const handleGeminiText = async () => {
-    if (!value.trim() || !conversationId) return;
-    const res = await geminiText.mutateAsync({ prompt: value });
-    sendMessage.mutate({ conversation_id: conversationId, content: res.text });
-  };
-
-  const handleGeminiImage = async () => {
-    if (!value.trim() || !conversationId) return;
-    const res = await geminiImage.mutateAsync({ prompt: value });
-    if (res.imageUrl) {
-      sendMessage.mutate({ conversation_id: conversationId, content: `<img src="${res.imageUrl}" alt="Gemini Image" />` });
-    }
-  };
+  const COLORS = {
+  mistBlue: "#e6eff6",    // app background, chat background
+  sageGreen: "#dbeee2",   // user bubble
+  lightGray: "#f6f7f9",   // card, input background
+  slate: "#6b7a8f",       // header, sidebar, text, buttons
+  taupe: "#c7bca1",       // borders, assistant bubble border
+  white: "#ffffff",       // assistant bubble, highlights
+};
 
   return (
-    <InputGroup>
-      <FormControl
-        placeholder="Type a message or prompt..."
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && handleSend()}
-        disabled={!conversationId}
-      />
-      <Dropdown>
-        <Dropdown.Toggle variant="secondary">Gemini</Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item onClick={handleGeminiText}>Generate Text</Dropdown.Item>
-          <Dropdown.Item onClick={handleGeminiImage}>Generate Image</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-      <Button variant="primary" onClick={handleSend} disabled={!conversationId}>
-        Send
-      </Button>
-    </InputGroup>
+    <div>
+      <InputGroup>
+        <FormControl
+          placeholder="Type a message or 'image: your prompt' for an image..."
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          disabled={!conversationId}
+          style={{
+            borderRadius: '0.75rem',
+            border: `1px solid ${COLORS.taupe}`,
+            backgroundColor: COLORS.lightGray,
+            color: COLORS.slate,
+          }}
+        />
+        <Button
+          variant="primary"
+          onClick={handleSend}
+          disabled={!conversationId}
+          style={{
+            borderRadius: '0 0.75rem 0.75rem 0',
+            backgroundColor: COLORS.slate,
+            border: 'none',
+            color: COLORS.white,
+          }}
+        >
+          Send
+        </Button>
+      </InputGroup>
+    </div>
   );
 }
